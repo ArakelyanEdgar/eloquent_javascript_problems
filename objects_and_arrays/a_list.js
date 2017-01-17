@@ -44,4 +44,29 @@ function list_to_array(list, array){
     return array;
 }
 
-console.log(list_to_array(array_to_list([0, 5, 10])));
+function prepend(element, list){
+
+    var temporary_array = list_to_array(list);
+    var lenght = temporary_array.length;
+
+    temporary_array.unshift(element);
+
+    var prepend_list = array_to_list(temporary_array);
+
+    return prepend_list;
+}
+
+function nth(list, number){
+
+    var temp_array = list_to_array(list);
+    var length = temp_array.length;
+
+    if ((number >= length) || (number < 0)){
+        return "Thats not a valid index!"
+    }
+    else{
+        return temp_array[number];
+    }
+}
+
+console.log(nth(array_to_list([10, 20, 30]), 1))
