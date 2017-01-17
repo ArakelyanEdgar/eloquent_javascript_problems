@@ -18,7 +18,7 @@ function array_to_list(array){
 
     current_obj = null;
 
-    return JSON.stringify(list, null, 2);
+    return list;
 }
 
 function list_to_array(list, array){
@@ -29,11 +29,11 @@ function list_to_array(list, array){
 
     for (var reference in list){
         if (reference == "value"){
-            array.push(reference);
+            array.push(list[reference]);
         }
         if (reference == "rest"){
-            if (reference != null){
-                list_to_array(reference, array)
+            if (list[reference] != null){
+                list_to_array(list[reference], array)
             }
             else {
                 return array
