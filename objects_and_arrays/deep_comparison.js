@@ -3,18 +3,23 @@ function deepEqual(value_1, value_2, bool){
     if (!bool){
         bool = true;
     }
-    var type_value = typeof(obj1);
+    var type_value = typeof(value_1);
     if (type_value != "object" || type_value == null){
         if (value_1 == value_2){
             bool = true
+            return bool;
         }
         else{
             bool = false;
+            return bool;
         }
     }
     else {
         var new_bool = false;
         for (var property_1 in value_1){
+            if (bool == false){
+                return false;
+            }
             var temp_prop_2;
             for (var property_2 in value_2){
                 if (property_2 == property_1){
@@ -24,9 +29,10 @@ function deepEqual(value_1, value_2, bool){
             }
             if (new_bool == false){
                 bool = false;
+                return bool;
             }
             else{
-                deepEqual(value_1[property_1], value_2[temp_prop_2], bool)
+                bool = deepEqual(value_1[property_1], value_2[temp_prop_2], bool)
             }
         }
     }
