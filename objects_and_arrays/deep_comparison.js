@@ -14,6 +14,7 @@ function deepEqual(value_1, value_2, bool){
             return bool;
         }
     }
+    //a
     else {
         var new_bool = false;
         for (var property_1 in value_1){
