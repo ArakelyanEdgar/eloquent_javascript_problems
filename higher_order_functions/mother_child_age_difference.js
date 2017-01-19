@@ -9,7 +9,7 @@ var byName = {}
 ancestry_array.forEach(function(element){
     byName[element.name] = element;
 })
-
+//using counter to count only those whose mothers exist in the ancestry array
 var counter = 0;
 
 var net_age_difference = ancestry_array.reduce(function(net_diff, curr_person){
