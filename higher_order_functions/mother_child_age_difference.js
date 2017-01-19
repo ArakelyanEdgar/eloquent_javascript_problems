@@ -10,14 +10,16 @@ ancestry_array.forEach(function(element){
     byName[element.name] = element;
 })
 
+var counter = 0;
 
 var net_age_difference = ancestry_array.reduce(function(net_diff, curr_person){
         if (byName[curr_person.mother]){
-            return  curr_person.born - byName[curr_person.mother].born;
+            counter++;
+            return  net_diff + curr_person.born - byName[curr_person.mother].born;
         }
         else {
             return net_diff;
         }
 }, 0)
 
-console.log(net_age_difference);
+console.log(net_age_difference/counter);
