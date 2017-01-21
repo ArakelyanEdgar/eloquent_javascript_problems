@@ -180,7 +180,7 @@ World.prototype.turn = function() {
   var acted = [];
   this.grid.forEach(function(critter, vector) {
     //checking if the char in question can move and if it hasn't moved yet
-    if (critter != null && critter != "#" && critter.act && acted.indexOf(critter) == -1) {
+    if (critter.act && acted.indexOf(critter) == -1) {
       acted.push(critter);
       this.letAct(critter, vector);
     }
