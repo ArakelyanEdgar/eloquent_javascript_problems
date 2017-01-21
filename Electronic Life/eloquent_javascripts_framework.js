@@ -4,6 +4,15 @@
 //I will be using this interface in order to solve the problems
 //given as is intended by the author
 
+//these vector constructors will be able to store coordinates 
+//for the grid essentially
+function Vector(x, y) {
+  this.x = x;
+  this.y = y;
+}
+Vector.prototype.plus = function(other) {
+  return new Vector(this.x + other.x, this.y + other.y);
+};
 
 //creating a grid constructor, where this.space creates an array with 
 //size width*height which is essentially the area
@@ -45,6 +54,10 @@ var directions = {
 //random element is a function that expects to receieve an array
 //that holds certain possible directions, thus randomELement will
 //randomly choose one of these elements, that are in fact directions
+//var directionNames is an example of one
+
+var directionNames = "n ne e se s sw w nw".split(" ");
+
 function randomElement(array) {
   return array[Math.floor(Math.random() * array.length)];
 }
@@ -90,7 +103,7 @@ function elementFromChar(legend, ch) {
 //the legend object.
 
 //a grid plan might look something like this:
-/*
+
 
 var plan = ["############################",
             "#      #    #      o      ##",
@@ -105,8 +118,7 @@ var plan = ["############################",
             "#    #                     #",
             "############################"];
 
-and this plan array would be passed as map into world
-*/
+//and this plan array would be passed as map into world
 
 
 function World(map, legend) {
@@ -148,3 +160,100 @@ World.prototype.toString = function() {
   }
   return output;
 };
+
+//wall is an empty constructor becuase we don't want a wall contstructor
+//to do anything
+function Wall(){
+
+}
+
+var world = new World(plan, {"#": Wall,
+                             "o": BouncingCritter});
+
+//now we want to give World properties that will allow its
+//chars to move from vector(a,b) to another vector
+//we also want to keep an array that says which chars have acted
+//so that when we loop over the array, that we do not give a turn
+//to move to a char that has already moved
+
+World.prototype.turn = function() {
+  var acted = [];
+  this.grid.forEach(function(critter, vector) {
+    //checking if the char in question can move and if it hasn't moved yet
+    if (critter != null && critter != "#" && critter.act && acted.indexOf(critter) == -1) {
+      acted.push(critter);
+      this.letAct(critter, vector);
+    }
+  }, this);
+};
+
+//this will be the method that will allow us to move chars around the 
+// grid
+World.prototype.letAct = function(critter, vector) {
+  //remember that critter is an object with the method act 
+  // which returns an object saying several things about the chars
+  //acting characteristics
+  var action = critter.act(new View(this, vector));
+  if (action && action.type == "move") {
+    //checking if the destination is valid and if it is an open space
+    //if it is then we want to set the coordinate for the current grid 
+    //space occupied by the char to be open, or null, and to set the vector
+    //space in the grid to be whatever checkDestination says it to be
+    var dest = this.checkDestination(action, vector);
+    if (dest && this.grid.get(dest) == null) {
+      this.grid.set(vector, null);
+      this.grid.set(dest, critter);
+    }
+  }
+};
+
+World.prototype.checkDestination = function(action, vector) {
+  if (directions.hasOwnProperty(action.direction)) {
+    var dest = vector.plus(directions[action.direction]);
+    if (this.grid.isInside(dest))
+      return dest;
+  }
+};
+
+//now we define view
+
+function View(world, vector) {
+  this.world = world;
+  this.vector = vector;
+}
+
+View.prototype.look = function(dir) {
+  //finding the coordinate in which the char wishes to move
+  var target = this.vector.plus(directions[dir]);
+  //if this vector is available inside the grid
+  //then we will return a value holding the char inside the
+  //wanted grid space, else we will say it is a wall char, thus 
+  //saying that movement into that vector is impossible
+  if (this.world.grid.isInside(target))
+    return charFromElement(this.world.grid.get(target));
+  else
+    return "#";
+};
+
+//Given a char, check if the surround directional vectors lead to the char wanted
+//if so, return them in as an array showing which directions they are.
+View.prototype.findAll = function(ch) {
+  var found = [];
+  for (var dir in directions)
+    if (this.look(dir) == ch)
+      found.push(dir);
+  return found;
+};
+
+//uses findAll to return a single element rather than an array
+View.prototype.find = function(ch) {
+  var found = this.findAll(ch);
+  if (found.length == 0) return null;
+  return randomElement(found);
+};
+
+//here we will run 5 frames of world, because of view the chars will move around
+for (var i = 0; i < 5; i++) {
+  world.turn();
+  console.log(world.toString());
+}
